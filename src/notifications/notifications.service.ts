@@ -9,7 +9,7 @@ export class NotificationsService {
     this.initializeFirebase(); // constructor内でFirebaseの初期化を呼び出す
   }
 
-  // メソッドは function キーワードを使わない
+  
   async initializeFirebase() {
     try {
       const serviceAccountPath = path.resolve(__dirname, '../../serviceAccountKey.json');

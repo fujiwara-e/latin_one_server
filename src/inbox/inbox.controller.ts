@@ -3,7 +3,7 @@ import { InboxService } from './inbox.service';
 @Controller('inbox')
 export class InboxController {
   constructor(private readonly inboxService: InboxService) {}
-  @Post('send')
+  @Post('addfirebase')
   async sendNotification(
     @Body('date') date: string,
     @Body('title') title: string,
@@ -11,10 +11,10 @@ export class InboxController {
     @Body('image') image: string
   ) {
     try {
-      const response = await this.inboxService.registfirebase(date, title, description, image);
-      return { success: true, message: response };
+      await this.inboxService.registfirebase(date, title, description, image);
+      return 'Added to firebase successfully!';
     } catch (error) {
-      return { success: false, message: error.message };
+      return `Failed to add to firebase: ${error.message}`;
     }
   }
 }
