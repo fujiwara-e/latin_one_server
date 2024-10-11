@@ -1,16 +1,24 @@
-import { Controller, Get } from '@nestjs/common';
-import { AppService } from './app.service';
+import { Body, Controller, Post, Get } from '@nestjs/common';
+import { FirebaseService } from './firebase';
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  constructor(private firebaseService: FirebaseService) {}
 
-  @Get()
-  getHello(): string {
-    return this.appService.getHello();
+  @Post('send')
+  async sendNotification(
+    @Body('token') token: string,
+  ){
+    try {
+      await this.firebaseService.sendNotification(token);
+      return 'Notification sent successfully!';
+    } catch (error) {
+      return `Failed to send notification: ${error.message}`;
+    }
   }
-  @Get('goodbye')
-getGoodbye(): string {
-    return this.appService.getGoodbye();
-}
+  @Get()
+  gethello(): string{
+    return 'hello'
+  }
+  
 }
