@@ -1,17 +1,23 @@
 import { Controller, Post, Body } from '@nestjs/common';
 import { InboxService } from './inbox.service';
+import { NotificationsService } from '../notifications/notifications.service';
+
 @Controller('inbox')
 export class InboxController {
-  constructor(private readonly inboxService: InboxService) {}
+  constructor(private readonly inboxService: InboxService,
+  private readonly notificationsService: NotificationsService,
+  ) {}
   @Post('addfirebase')
-  async sendNotification(
-    @Body('date') date: string,
+  async ReceivePostAndRegisterToFirestore(
+    @Body('topic') topic: string,
     @Body('title') title: string,
-    @Body('description') description: string,
+    @Body('body') body: string,
     @Body('image') image: string
   ) {
     try {
-      await this.inboxService.registfirebase(date, title, description, image);
+      await this.inboxService.RegisterFirebase(topic, title, body, image);
+      await this.notificationsService.SendNotificationForAll(topic, title, body);
+
       return 'Added to firebase successfully!';
     } catch (error) {
       return `Failed to add to firebase: ${error.message}`;

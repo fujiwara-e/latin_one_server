@@ -9,7 +9,6 @@ export class NotificationsService {
     this.initializeFirebase(); // constructor内でFirebaseの初期化を呼び出す
   }
 
-  
   async initializeFirebase() {
     try {
       const serviceAccountPath = path.resolve(__dirname, '../../serviceAccountKey.json');
@@ -25,7 +24,24 @@ export class NotificationsService {
     }
   }
 
-  async sendNotification(registrationToken: string): Promise<void> {
+  async SendNotificationForAll(topic: string, title: string, body: string): Promise<void> {
+    const message = {
+      notification: {
+        title: title,
+        body: body,
+      },
+      topic: topic,
+    };
+
+    try {
+      const response = await admin.messaging().send(message);
+      console.log('Successfully sent message:', response);
+    } catch (error) {
+      console.error('Error sending message:', error);
+    }
+  }
+
+  async SendNotification(registrationToken: string): Promise<void> {
     const message = {
       notification: {
         title: 'テスト通知',
