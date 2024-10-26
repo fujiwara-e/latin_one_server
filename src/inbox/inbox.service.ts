@@ -1,27 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import * as admin from 'firebase-admin';
-import * as path from 'path';
-import { readFile } from 'fs/promises';
+import { admin } from '../firebase';
 import { format } from 'date-fns';
 @Injectable()
 export class InboxService {
     constructor() {
 
-    }
-
-    async initializeFirebase() {
-        try {
-            const serviceAccountPath = path.resolve(__dirname, '../../serviceAccountKey.json');
-            const serviceAccount = JSON.parse(await readFile(serviceAccountPath, 'utf-8'));
-
-            admin.initializeApp({
-                credential: admin.credential.cert(serviceAccount),
-            });
-
-            console.log('Firebase initialized successfully');
-        } catch (error) {
-            console.error('Error initializing Firebase:', error);
-        }
     }
 
     async RegisterFirebase(topic: string,title: string, body: string, imagePath: string): Promise<void> {

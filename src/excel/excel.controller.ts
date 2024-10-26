@@ -1,25 +1,15 @@
 import { Controller, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import { extname } from 'path';
+import { ExcelService } from './excel.service';
 
 @Controller('excel')
 export class ExcelController {
- @Post('upload')
-  @UseInterceptors(FileInterceptor('file', {
-    storage: diskStorage({
-      destination: './uploads',
-      filename: (req, file, cb) => {
-        const randomName = Array(32).fill(null).map(() => (Math.round(Math.random() * 16)).toString(16)).join('');
-        cb(null, `${randomName}${extname(file.originalname)}`);
-      },
-    }),
-  }))
+  constructor(private readonly excelService: ExcelService) {}
+
+  @Post('upload')
+  @UseInterceptors(FileInterceptor('file'))
   uploadFile(@UploadedFile() file: Express.Multer.File) {
-    console.log(file);
-    return {
-      message: 'File uploaded successfully',
-      filename: file.filename,
-    };
+    this.excelService.SaveUploadFile(file);
+    return this.excelService.handleFileUpload(file);
   }
 }
