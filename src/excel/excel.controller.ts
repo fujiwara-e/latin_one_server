@@ -8,17 +8,25 @@ export class ExcelController {
   constructor(private readonly excelService: ExcelService) {}
   @Post('download')
   async DownloadFile(@Res() res: Response, @Body('category') category: string,) {
+      console.log(category);
     const filePath = 'uploads/' + category + '.xlsx';
-    const data = await this.excelService.GetDocumentsWithFields(category);
-    this.excelService.ExportDataToExcel(data, category, filePath);
-    res.download(filePath, category + '.xlsx', (err) => {
-      if (err) {
-        console.error('Error sending file:', err);
-        res.status(500).send('Could not download the file.');
-      } else {
-        console.log('File sent successfully');
-      }
-    });
+    try {
+
+        const data = await this.excelService.GetDocumentsWithFields(category);
+        await this.excelService.ExportDataToExcel(data, category, filePath);
+
+        res.download(filePath, category + '.xlsx', (err) => {
+            if (err) {
+                console.error('Error sending file:', err);
+                res.status(500).send('Could not download the file.');
+            } else {
+                console.log('File sent successfully');
+            }
+        });
+    } catch (error) {
+        console.error('Error generating or sending file:', error);
+      res.status(500).send('An error occurred during file generation.');
+    }
   }
 
   @Post('upload')
