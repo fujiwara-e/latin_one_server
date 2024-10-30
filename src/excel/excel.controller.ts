@@ -10,31 +10,36 @@ export class ExcelController {
   async DownloadFile(@Res() res: Response, @Body('category') category: string,) {
       console.log(category);
     const filePath = 'uploads/' + category + '.xlsx';
-    try {
-
-        const data = await this.excelService.GetDocumentsWithFields(category);
-        await this.excelService.ExportDataToExcel(data, category, filePath);
-
-        res.download(filePath, category + '.xlsx', (err) => {
-            if (err) {
-                console.error('Error sending file:', err);
-                res.status(500).send('Could not download the file.');
-            } else {
-                console.log('File sent successfully');
-            }
-        });
-    } catch (error) {
-        console.error('Error generating or sending file:', error);
-      res.status(500).send('An error occurred during file generation.');
+    let collectionName: string;
+    if (category === 'Shop'){
+      collectionName = "shops";
+    } else if (category === 'Product'){
+      collectionName = "Products";
     }
+    const data = await this.excelService.GetDocumentsWithFields(collectionName);
+    await this.excelService.ExportDataToExcel(data, category, filePath);
+    res.download(filePath, category + '.xlsx', (err) => {
+      if (err) {
+        console.error('Error sending file:', err);
+        res.status(500).send('Could not download the file.');
+      } else {
+        console.log('File sent successfully');
+      }
+    });
   }
 
   @Post('upload')
   @UseInterceptors(FileInterceptor('file'))
-  async UploadFile(@UploadedFile() file: Express.Multer.File) {
-    // Shop か Product かを判断する処理
+  async UploadFile(@Body('category') category: string, @UploadedFile() file: Express.Multer.File) {
+    let collectionName: string;
+    if (category === 'Shop'){
+      collectionName = "shops";
+    } else if (category === 'Product'){
+      collectionName = "Products";
+    }
     this.excelService.SaveUploadFile(file);
-    this.excelService.ParseExcelFile('uploads/' + file.originalname);
+    const data = await this.excelService.ParseExcelFile('uploads/' + file.originalname);
+    await this.excelService.SaveToFirestore(data,collectionName);
     // パースしたデータをDBに保存する処理
     return this.excelService.handleFileUpload(file);
   }

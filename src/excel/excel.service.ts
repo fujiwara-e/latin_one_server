@@ -56,7 +56,8 @@ export class ExcelService {
   async ExportDataToExcel(data: { id: string; fields: any }[], category: string, filePath: string) {
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('Data');
-    if(category === 'shop') {
+
+    if(category === 'Shop') {
       const headers = [
         'Name', 'address', 'opening_hours', 'closing_hours', 'holiday',
         'latitude', 'longitude', 'mail_address', 'map_url', 'payment', 'phone_number'
@@ -79,21 +80,24 @@ export class ExcelService {
         ];
         worksheet.addRow(row);
       });
-    } else if(category === 'product') {
+    } else if(category === 'Product') {
       const headers = [
         'Category', 'Name', 'Price', 'Description', 'ImagePath'
       ];
-      worksheet.addRow(headers);
 
+      worksheet.addRow(headers);
       data.forEach(item => {
-        const row = [
-          item.id,
-          item.fields.description,
-          item.fields.image,
-          item.fields.price,
-          item.fields.shop_id,
-        ];
-        worksheet.addRow(row);
+        Object.keys(item.fields).forEach(key => {
+          const field = item.fields[key];
+          const row = [
+            item.id,
+            field.name || '',
+            field.price || '',
+            field.description || '',
+            field.imagepath || ''
+          ];
+          worksheet.addRow(row);
+        });
       });
     }
 
@@ -101,7 +105,7 @@ export class ExcelService {
     console.log(`Data exported to ${filePath}`);
   }
 
-  async PostDataToFirestore(data: any[], collectionName: string) {
+  async SaveToFirestore(data: any[], collectionName: string) {
     data.forEach(async item => {
       await admin.firestore().collection(collectionName).doc(item.id).set(item.fields);
     });
