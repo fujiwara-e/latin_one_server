@@ -8,12 +8,12 @@ export class ExcelController {
   constructor(private readonly excelService: ExcelService) {}
   @Post('download')
   async DownloadFile(@Res() res: Response, @Body('category') category: string,) {
-      console.log(category);
+    console.log(category);
     const filePath = 'uploads/' + category + '.xlsx';
     let collectionName: string;
-    if (category === 'Shop'){
+    if (category === 'shop'){
       collectionName = "shops";
-    } else if (category === 'Product'){
+    } else if (category === 'product'){
       collectionName = "Products";
     }
     const data = await this.excelService.GetDocumentsWithFields(collectionName);
@@ -30,17 +30,11 @@ export class ExcelController {
 
   @Post('upload')
   @UseInterceptors(FileInterceptor('file'))
-  async UploadFile(@Body('category') category: string, @UploadedFile() file: Express.Multer.File) {
-    let collectionName: string;
-    if (category === 'Shop'){
-      collectionName = "shops";
-    } else if (category === 'Product'){
-      collectionName = "Products";
-    }
-    this.excelService.SaveUploadFile(file);
-    const data = await this.excelService.ParseExcelFile('uploads/' + file.originalname);
-    await this.excelService.SaveToFirestore(data,collectionName);
-    // パースしたデータをDBに保存する処理
+  async UploadFile(@UploadedFile() file: Express.Multer.File) {
+
+    const filePath = 'uploads/' + file.originalname;
+    await this.excelService.SaveUploadFile(file);
+    await this.excelService.UploadDataFromExcelToFirestore(filePath);
     return this.excelService.handleFileUpload(file);
   }
 }

@@ -3,6 +3,7 @@ import { admin } from '../firebase';
 import * as ExcelJS from 'exceljs';
 import * as fs from 'fs';
 import * as path from 'path';
+import { before } from 'node:test';
 
 @Injectable()
 export class ExcelService {
@@ -20,28 +21,6 @@ export class ExcelService {
     };
   }
 
-  async ParseExcelFile(filePath: string): Promise<any[]> {
-    const workbook = new ExcelJS.Workbook();
-    const data = [];
-
-    try {
-      await workbook.xlsx.readFile(filePath);
-      const worksheet = workbook.getWorksheet(1);
-
-      worksheet.eachRow((row, rowNumber) => {
-        if (rowNumber !== 1) {
-          const rowData = row.values;
-          data.push(rowData);
-        }
-      });
-      console.log('Data:', data);
-      return data;
-    } catch (error) {
-      console.error('Error parsing Excel file:', error);
-      throw error;
-    }
-  }
-
   async GetDocumentsWithFields(collectionName: string): Promise<{ id: string; fields: any }[]> {
     const data: { id: string; fields: any }[] = [];
     const snapshot = await admin.firestore().collection(collectionName).get();
@@ -57,7 +36,7 @@ export class ExcelService {
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('Data');
 
-    if(category === 'Shop') {
+    if(category === 'shop') {
       const headers = [
         'Name', 'address', 'opening_hours', 'closing_hours', 'holiday',
         'latitude', 'longitude', 'mail_address', 'map_url', 'payment', 'phone_number'
@@ -80,7 +59,7 @@ export class ExcelService {
         ];
         worksheet.addRow(row);
       });
-    } else if(category === 'Product') {
+    } else if(category === 'product') {
       const headers = [
         'Category', 'Name', 'Price', 'Description', 'ImagePath'
       ];
@@ -105,9 +84,71 @@ export class ExcelService {
     console.log(`Data exported to ${filePath}`);
   }
 
-  async SaveToFirestore(data: any[], collectionName: string) {
-    data.forEach(async item => {
-      await admin.firestore().collection(collectionName).doc(item.id).set(item.fields);
-    });
+  async UploadDataFromExcelToFirestore(filePath: string) {
+    const workbook = new ExcelJS.Workbook();
+    try {
+      await workbook.xlsx.readFile(filePath);
+      const worksheet = workbook.getWorksheet(1);
+      var i = 0;
+      var j = 0;
+      let data;
+      let beforeCategory;
+
+      worksheet.eachRow(async (row, rowNumber) => {
+        if (i !== 0) {
+          const rowValues = row.values;
+          const isShopCategory = rowValues.length === 12;
+          let doc_id = rowValues[1] as string;
+
+          if(isShopCategory) {
+            doc_id = rowValues[1] as string;
+            data = {
+              address: rowValues[2],
+              opening_hours: rowValues[3],
+              closing_hours: rowValues[4],
+              holiday: rowValues[5],
+              latitude: rowValues[6],
+              longitude: rowValues[7],
+              mail_address: rowValues[8],
+              map_url: rowValues[9],
+              payment: rowValues[10],
+              phone_number: rowValues[11]
+            };
+            await admin.firestore().collection('shops').doc(doc_id).set(data);
+            console.log(`Uploaded document with ID: ${doc_id}`);
+          } else {
+            if (j !== 0 && beforeCategory !== rowValues[1]) {
+              admin.firestore().collection('Products').doc(beforeCategory).set(data);
+              console.log(`Uploaded document with ID: ${beforeCategory}`);
+              console.log('Data:', data);
+              j = 0;
+              data = {};
+            }
+            doc_id = rowValues[1] as string;
+            data = {
+              ...data,
+              [j]: {
+                name: rowValues[2],
+                price: rowValues[3],
+                description: rowValues[4],
+                imagepath: rowValues[5]
+              }
+            };
+            j++;
+            beforeCategory = rowValues[1];
+          }
+        }
+        i++;
+      });
+      if (j !== 0 && beforeCategory){
+        await admin.firestore().collection('Products').doc(beforeCategory).set(data);
+        console.log(`Uploaded document with ID: ${beforeCategory}`);
+        console.log('Data:', data);
+      }
+      console.log('Data uploaded to Firestore');
+    } catch (error) {
+      console.error('Error uploading data from Excel to Firestore:', error);
+      throw error;
+    }
   }
 }
