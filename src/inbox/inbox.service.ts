@@ -69,16 +69,22 @@ export class InboxService {
                     console.log('Successfully sent message:', docRef);
                }
             }else{
-                const data = {
-                  [newDocId] :{
-                    date: format(new Date(), 'yyyy-MM-dd'),
-                    title: title,
-                    body: body,
-                    imagePath: imagePath
-                  }
-                };
-                const docRef = await admin.firestore().collection('Inbox').doc('Message').set(data);
-                console.log('Successfully sent message:', docRef);
+                const backRef = admin.firestore().collection('Inbox').doc('WhatsNew');
+                const docSnapshot = await backRef.get();
+                if (docSnapshot.exists) {
+                    const existingData = docSnapshot.data();
+                    const data = {
+                      ...existingData,
+                      [newDocId] :{
+                        date: format(new Date(), 'yyyy-MM-dd'),
+                        title: title,
+                        body: body,
+                        imagePath: imagePath
+                      }
+                    };
+                    const docRef = await admin.firestore().collection('Inbox').doc('Message').set(data);
+                    console.log('Successfully sent message:', docRef);
+                }
             }
         } catch (error) {
             console.error('Error sending message:', error);
