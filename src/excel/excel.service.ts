@@ -89,49 +89,60 @@ export class ExcelService {
     try {
       await workbook.xlsx.readFile(filePath);
       const worksheet = workbook.getWorksheet(1);
-      var i = 0;
-      var j = 0;
-      let data;
-      let beforeCategory;
-
+      let i = 0;
+      let j = 0;
+      let data: any;
+      let beforeCategory: string | undefined;
+  
+      const getPlainText = (cell: ExcelJS.Cell): string => {
+        if (cell.value && typeof cell.value === 'object') {
+          if (cell.value.hasOwnProperty('richText')) {
+            return (cell.value as ExcelJS.CellRichTextValue).richText.map(part => part.text).join('');
+          }
+          if (cell.value.hasOwnProperty('text')) {
+            return (cell.value as ExcelJS.CellHyperlinkValue).text || '';
+          }
+        }
+        return cell.text || cell.value?.toString() || '';
+      };      
+  
       worksheet.eachRow(async (row, rowNumber) => {
         if (i !== 0) {
-          const rowValues = row.values;
+          const rowValues = row.values as any[];
           const isShopCategory = rowValues.length === 12;
-          let doc_id = rowValues[1] as string;
-
-          if(isShopCategory) {
-            doc_id = rowValues[1] as string;
+          let doc_id = getPlainText(row.getCell(1));
+  
+          if (isShopCategory) {
             data = {
-              address: rowValues[2],
-              opening_hours: rowValues[3],
-              closing_hours: rowValues[4],
-              holiday: rowValues[5],
-              latitude: rowValues[6],
-              longitude: rowValues[7],
-              mail_address: rowValues[8],
-              map_url: rowValues[9],
-              payment: rowValues[10],
-              phone_number: rowValues[11]
+              address: getPlainText(row.getCell(2)),
+              opening_hours: getPlainText(row.getCell(3)),
+              closing_hours: getPlainText(row.getCell(4)),
+              holiday: getPlainText(row.getCell(5)),
+              latitude: getPlainText(row.getCell(6)),
+              longitude: getPlainText(row.getCell(7)),
+              mail_address: getPlainText(row.getCell(8)),
+              map_url: getPlainText(row.getCell(9)),
+              payment: getPlainText(row.getCell(10)),
+              phone_number: getPlainText(row.getCell(11))
             };
             await admin.firestore().collection('shops').doc(doc_id).set(data);
             console.log(`Uploaded document with ID: ${doc_id}`);
           } else {
             if (j !== 0 && beforeCategory !== rowValues[1]) {
-              admin.firestore().collection('Products').doc(beforeCategory).set(data);
+              await admin.firestore().collection('Products').doc(beforeCategory).set(data);
               console.log(`Uploaded document with ID: ${beforeCategory}`);
               console.log('Data:', data);
               j = 0;
               data = {};
             }
-            doc_id = rowValues[1] as string;
+            doc_id = getPlainText(row.getCell(1));
             data = {
               ...data,
               [j]: {
-                name: rowValues[2],
-                price: rowValues[3],
-                description: rowValues[4],
-                imagepath: rowValues[5]
+                name: getPlainText(row.getCell(2)),
+                price: getPlainText(row.getCell(3)),
+                description: getPlainText(row.getCell(4)),
+                imagepath: getPlainText(row.getCell(5))
               }
             };
             j++;
@@ -140,15 +151,17 @@ export class ExcelService {
         }
         i++;
       });
-      if (j !== 0 && beforeCategory){
+  
+      if (j !== 0 && beforeCategory) {
         await admin.firestore().collection('Products').doc(beforeCategory).set(data);
         console.log(`Uploaded document with ID: ${beforeCategory}`);
         console.log('Data:', data);
       }
+  
       console.log('Data uploaded to Firestore');
     } catch (error) {
       console.error('Error uploading data from Excel to Firestore:', error);
       throw error;
     }
-  }
+  }  
 }
