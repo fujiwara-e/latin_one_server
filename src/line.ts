@@ -2,8 +2,6 @@ import { Client, ClientConfig, Message } from '@line/bot-sdk';
 import * as dotenv from 'dotenv';
 dotenv.config();
 
-console.log(process.env.CHANNEL_ACCESS_TOKEN)
-
 const config: ClientConfig = {
   channelAccessToken: process.env.CHANNEL_ACCESS_TOKEN ,
   channelSecret: process.env.CHANNEL_SECRET ,
