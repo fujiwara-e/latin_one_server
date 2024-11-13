@@ -1,16 +1,15 @@
 import { Client, ClientConfig, Message } from '@line/bot-sdk';
+import * as dotenv from 'dotenv';
+dotenv.config();
 
-
-console.log('CHANNEL_ACCESS_TOKEN:', process.env.CHANNEL_ACCESS_TOKEN);
-console.log('CHANNEL_SECRET:', process.env.CHANNEL_SECRET);
-console.log('LINE_USER_ID:', process.env.LINE_USER_ID);
+console.log(process.env.CHANNEL_ACCESS_TOKEN)
 
 const config: ClientConfig = {
-  channelAccessToken: process.env.CHANNEL_ACCESS_TOKEN || '',
-  channelSecret: process.env.CHANNEL_SECRET || '',
+  channelAccessToken: process.env.CHANNEL_ACCESS_TOKEN ,
+  channelSecret: process.env.CHANNEL_SECRET ,
 };
 const client = new Client(config);
-const userId = process.env.LINE_USER_ID || '';
+const userId = process.env.LINE_USER_ID ;
 
 export const notify = async (message: Message) => {
   try {
