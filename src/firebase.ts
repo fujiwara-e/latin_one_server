@@ -2,6 +2,8 @@ import * as admin from 'firebase-admin';
 import * as path from 'path';
 import { readFile } from 'fs/promises'
 
+let firestore;
+
 async function initializeFirebase() {
   try {
     const serviceAccountPath = path.resolve(__dirname, '../serviceAccountKey.json');
@@ -11,6 +13,8 @@ async function initializeFirebase() {
       credential: admin.credential.cert(serviceAccount)
     });
 
+    firestore = admin.firestore();
+
     console.log('Firebase initialized successfully');
   } catch (error) {
     console.error('Error initializing Firebase:', error);
@@ -18,4 +22,4 @@ async function initializeFirebase() {
 }
 
 initializeFirebase();
-export {admin};
+export {admin, firestore};
