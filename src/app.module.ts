@@ -10,10 +10,12 @@ import { LineController } from './line/line.controller';
 import { LineService } from './line/line.service';
 import { SubscriptionController } from './subscription/subscription.controller';
 import { SubscriptionService } from './subscription/subscription.service';
+import { PollingService } from './polling/polling.service';
+import { PollingController } from './polling/polling.controller';
 
 @Module({
   imports: [],
-  controllers: [AppController, NotificationsController, InboxController, ExcelController, LineController, SubscriptionController],
-  providers: [NotificationsService, InboxService, ExcelService, LineService, SubscriptionService],
+  controllers: [AppController, NotificationsController, InboxController, ExcelController, LineController, SubscriptionController, PollingController],
+  providers: [NotificationsService, InboxService, ExcelService, LineService, SubscriptionService, PollingService],
 })
 export class AppModule {}

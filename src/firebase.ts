@@ -4,7 +4,7 @@ import { readFile } from 'fs/promises'
 
 let firestore;
 
-async function initializeFirebase() {
+export async function initializeFirebase() {
   try {
     const serviceAccountPath = path.resolve(__dirname, '../serviceAccountKey.json');
     const serviceAccount = JSON.parse(await readFile(serviceAccountPath, 'utf-8'));

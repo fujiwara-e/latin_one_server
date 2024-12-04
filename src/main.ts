@@ -1,9 +1,10 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { admin } from './firebase';
+import { initializeFirebase } from './firebase';
 //import * as dotenv from 'dotenv';
 //dotenv.config();
 async function bootstrap() {
+    await initializeFirebase();
   const app = await NestFactory.create(AppModule);
   // CORSを有効にする
   app.enableCors({
