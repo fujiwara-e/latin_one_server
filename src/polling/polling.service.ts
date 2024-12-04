@@ -1,12 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import {admin, firestore} from '../firebase';
-import {LineService} from '../line/line.service'
+import { admin, firestore } from '../firebase';
+import { LineService } from '../line/line.service'
 import { Message } from '@line/bot-sdk';
 
 @Injectable()
 export class PollingService {
-    constructor(private readonly lineservice: LineService){
-        console.log(firestore);
+    constructor(private readonly lineservice: LineService) {
         this.startListening();
     }
 
@@ -18,24 +17,24 @@ export class PollingService {
         collectionRef.onSnapshot((snapshot) => {
             snapshot.docChanges().forEach((change) => {
                 if (change.type === 'added') {
-                    const message: Message ={
+                    const message: Message = {
                         type: 'text',
-                        text: "ドキュメントが追加されました" 
+                        text: "ドキュメントが追加されました"
                     }
                     this.lineservice.sendNotification(message);
 
                 }
                 if (change.type === 'modified') {
-                    const message: Message ={
+                    const message: Message = {
                         type: 'text',
-                        text: "ドキュメントが変更されました" 
+                        text: "ドキュメントが変更されました"
                     }
                     this.lineservice.sendNotification(message);
                 }
                 if (change.type === 'removed') {
-                    const message: Message ={
+                    const message: Message = {
                         type: 'text',
-                        text: "ドキュメントが消去されました" 
+                        text: "ドキュメントが消去されました"
                     }
                     this.lineservice.sendNotification(message);
                 }
