@@ -1,16 +1,15 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { initializeFirebase } from './firebase';
-//import * as dotenv from 'dotenv';
-//dotenv.config();
+
 async function bootstrap() {
     await initializeFirebase();
   const app = await NestFactory.create(AppModule);
-  // CORSを有効にする
+
   app.enableCors({
-    origin: 'http://localhost:3000', // クライアントのURLを指定
-    methods: 'GET,POST', // 許可するHTTPメソッド
-    credentials: true, // Cookieを使用する場合に必要
+    origin: 'http://localhost:3000',
+    methods: 'GET,POST',
+    credentials: true,
   });
   await app.listen(4000);
 }
