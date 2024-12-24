@@ -12,10 +12,18 @@ import { SubscriptionController } from './subscription/subscription.controller';
 import { SubscriptionService } from './subscription/subscription.service';
 import { PollingService } from './polling/polling.service';
 import { PollingController } from './polling/polling.controller';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
+
 
 @Module({
-  imports: [],
+  imports: [
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'build'),
+      renderPath: '*',
+    }),
+  ],
   controllers: [AppController, NotificationsController, InboxController, ExcelController, LineController, SubscriptionController, PollingController],
   providers: [NotificationsService, InboxService, ExcelService, LineService, SubscriptionService, PollingService],
 })
-export class AppModule {}
+export class AppModule { }
