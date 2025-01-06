@@ -93,8 +93,11 @@ export class ExcelService {
       let j = 0;
       let data: any;
       let beforeCategory: string | undefined;
-  
-      const getPlainText = (cell: ExcelJS.Cell): string => {
+
+      const getPlainText = (cell: ExcelJS.Cell): string | number => {
+        if (typeof cell.value === 'number') {
+          return cell.value;
+        }
         if (cell.value && typeof cell.value === 'object') {
           if (cell.value.hasOwnProperty('richText')) {
             return (cell.value as ExcelJS.CellRichTextValue).richText.map(part => part.text).join('');
@@ -104,14 +107,14 @@ export class ExcelService {
           }
         }
         return cell.text || cell.value?.toString() || '';
-      };      
-  
+      };
+
       worksheet.eachRow(async (row, rowNumber) => {
         if (i !== 0) {
           const rowValues = row.values as any[];
           const isShopCategory = rowValues.length === 12;
           let doc_id = getPlainText(row.getCell(1));
-  
+
           if (isShopCategory) {
             data = {
               address: getPlainText(row.getCell(2)),
@@ -125,7 +128,7 @@ export class ExcelService {
               payment: getPlainText(row.getCell(10)),
               phone_number: getPlainText(row.getCell(11))
             };
-            await admin.firestore().collection('shops').doc(doc_id).set(data);
+            await admin.firestore().collection('shops').doc(<string>doc_id).set(data);
             console.log(`Uploaded document with ID: ${doc_id}`);
           } else {
             if (j !== 0 && beforeCategory !== rowValues[1]) {
@@ -151,17 +154,17 @@ export class ExcelService {
         }
         i++;
       });
-  
+
       if (j !== 0 && beforeCategory) {
         await admin.firestore().collection('Products').doc(beforeCategory).set(data);
         console.log(`Uploaded document with ID: ${beforeCategory}`);
         console.log('Data:', data);
       }
-  
+
       console.log('Data uploaded to Firestore');
     } catch (error) {
       console.error('Error uploading data from Excel to Firestore:', error);
       throw error;
     }
-  }  
+  }
 }
