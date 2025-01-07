@@ -12,7 +12,7 @@ export class PollingService {
 
     private startListening() {
         // コレクションの監視
-        const collectionRef = admin.firestore().collection('test');
+        const collectionRef = admin.firestore().collection('Orders');
 
         collectionRef.onSnapshot((snapshot) => {
             snapshot.docChanges().forEach((change) => {
