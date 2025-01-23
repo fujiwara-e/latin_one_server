@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import {admin} from '../firebase';
+import { admin } from '../firebase';
 
 @Injectable()
 export class NotificationsService {
@@ -23,17 +23,7 @@ export class NotificationsService {
     }
   }
 
-  async SendNotification(registrationToken: string): Promise<void> {
-    const message = {
-      notification: {
-        title: 'テスト通知',
-        body: 'テストのプッシュ通知です',
-      },
-      data: {
-        testData: '通知に含めたいデータなど',
-      },
-      token: registrationToken,
-    };
+  async SendNotification(message): Promise<void> {
 
     try {
       const response = await admin.messaging().send(message);
