@@ -5,7 +5,7 @@
 <p align="center">
 <img src="https://img.shields.io/badge/NestJS-blue?color=ef5350&logo=nestjs&style=flat-square">
 <img src="https://img.shields.io/badge/-Firebase-ef5350.svg?logo=firebase&style=flat-square">
-<a href="https://github.com/hosokawa-kenshin/Gcal.js/blob/main/README-ja.md">
+<a href="https://github.com/hosokawa-kenshin/latin_one_server/blob/main/README.md">
     <img height="20px" src="https://img.shields.io/badge/JA-flag.svg?color=45b8cd&style=flat-square&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA5MDAgNjAwIj4NCjxwYXRoIGZpbGw9IiNmZmYiIGQ9Im0wLDBoOTAwdjYwMGgtOTAweiIvPg0KPGNpcmNsZSBmaWxsPSIjYmUwMDI2IiBjeD0iNDUwIiBjeT0iMzAwIiByPSIxODAiLz4NCjwvc3ZnPg0K">
   </a>
 <img alt="GitHub License" src="https://img.shields.io/github/license/hosokawa-kenshin/latin_one_server?style=flat-square&logoColor=45b8cd&color=45b8cd">
@@ -53,4 +53,5 @@ $ npm run start
 
 ## License
 
-LatinOne is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+このプロジェクトは MIT Licenseの下でライセンスされている．
+詳細については，[LICENSE](LICENSE)ファイルを参照．
