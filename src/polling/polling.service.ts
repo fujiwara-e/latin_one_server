@@ -66,4 +66,38 @@ export class PollingService {
             });
         });
     }
+
+    async getLatestOrders(): Promise<any[]> {
+        const collectionRef = admin.firestore().collection('Orders');
+        const snapshot = await collectionRef
+            .orderBy('date', 'desc')
+            .limit(5)
+            .get();
+
+        return snapshot.docs.map((doc) => {
+            const data = doc.data();
+            return {
+                id: doc.id,
+                name: data.name,
+                date: (data.date.toDate()),
+                status: data.status,
+                mail_address: data.mail_address,
+                items: data.items,
+
+            };
+        });
+    }
+    private convertToJST(date: Date): string {
+        const jstOffset = 9 * 60;
+        const jstDate = new Date(date.getTime() + jstOffset * 60 * 1000);
+
+        const year = jstDate.getFullYear();
+        const month = String(jstDate.getMonth() + 1).padStart(2, '0');
+        const day = String(jstDate.getDate()).padStart(2, '0');
+        const hours = String(jstDate.getHours()).padStart(2, '0');
+        const minutes = String(jstDate.getMinutes()).padStart(2, '0');
+        const seconds = String(jstDate.getSeconds()).padStart(2, '0');
+
+        return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    }
 }
