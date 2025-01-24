@@ -19,7 +19,7 @@ import { join } from 'path';
 @Module({
   imports: [
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'build'),
+      rootPath: join(__dirname, '..', 'console'),
       renderPath: '*',
     }),
   ],
